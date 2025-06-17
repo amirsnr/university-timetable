@@ -1,0 +1,115 @@
+# University Class Timetable
+
+This project is a web-based timetable management system for a university. It allows users to view the class schedule and enables administrators to manage and update the timetable.
+
+## Features
+
+- User registration and login
+- Admin registration and login
+- JWT-based authentication
+- Admin-only protected routes
+- Timetable creation, update, and deletion (by admins)
+- Timetable filtering (by day or course) for all users
+- PDF report generation
+- PostgreSQL database
+- Flask REST API backend
+
+## Technologies Used
+
+- Python (Flask)
+- HTML, CSS, JavaScript (for frontend)
+- PostgreSQL
+- JWT for authentication
+- ReportLab for PDF generation
+- DBeaver (for managing the PostgreSQL database)
+- dotenv (.env) for secure environment variables
+
+## Setup Instructions
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/university-timetable.git
+   cd university-timetable
+   ```
+
+2. **Create a Virtual Environment**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment Variables**
+
+   Create a `.env` file in the root folder and add:
+   ```env
+   DB_HOST=localhost
+   DB_NAME=your_database_name
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   DB_PORT=5432
+   SECRET_KEY=your_secret_key
+   ```
+
+5. **Run the App**
+   ```bash
+   python app.py
+   ```
+
+6. **API Testing**
+
+   Use Postman to test API endpoints for:
+
+   - User/Admin registration
+   - Login
+   - Protected routes
+   - Timetable operations
+
+## Project Structure
+
+```
+timetable_project/
+│
+├── app.py               # Main Flask app
+├── auth.py              # Authentication and protected route logic
+├── db.py                # PostgreSQL database connection
+├── .env                 # Environment variables (hidden)
+├── templates/           # HTML templates (if any)
+├── static/              # Static files: CSS, JS
+├── requirements.txt     # Python dependencies
+└── README.md
+```
+
+---
+
+## How to Upload to GitHub
+
+Here’s a simple step-by-step:
+
+1. **Go to GitHub**
+
+   Log in and click the “+” in the top-right corner → “New repository”.
+
+2. **Create Repository**
+   - Repository name: `university-timetable`
+   - Description: *optional*
+   - Keep it **public**
+   - Do NOT check “Initialize with README” (you already have one)
+
+3. **Copy the GitHub link** (e.g. https://github.com/yourusername/university-timetable.git)
+
+4. **In your terminal** (inside your project folder):
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/yourusername/university-timetable.git
+   git push -u origin main
+   ```
+
+5. **Done!** Go to your GitHub repo page and refresh — you’ll see all your files.

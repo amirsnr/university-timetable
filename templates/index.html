@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>University Class Timetable</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <h1>University Class Timetable</h1>
+        <button id="downloadPdfBtn" style="display: none;">Download Timetable (PDF)</button>
+        <!-- Logout button (hidden initially) -->
+        <div id="logout-container" style="display: none;">
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="login-section">
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="email">Email:</label>
+                <input type="text" id="email" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+
+                <div class="button-row">
+                    <button type="button" id="loginBtn">Login</button>
+                </div>
+            </form>
+
+            <div id="register-toggle" style="text-align: center; margin-top: 1rem;">
+                <a href="#" id="show-register">Register new account</a>
+            </div>
+
+        </section>
+        <div id="register-section" style="display: none;">
+            <h2>Register</h2>
+            <button id="back-to-login" style="margin-bottom: 1rem;">← Back to Login</button>
+            <form id="register-form">
+                <label for="reg-username">Username:</label>
+                <input type="text" id="reg-username" required>
+                
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" required>
+                
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" required>
+                
+                <div id="admin-code-container" style="display: none;">
+                    <label for="admin-code">Admin Code:</label>
+                    <input type="password" id="admin-code" placeholder="Enter secret code">
+                </div>
+                
+                <div class="button-row">
+                    <button type="button" id="register-type-btn">Register as Student</button>
+                    <button type="button" id="register-submit-btn">Submit Registration</button>
+                </div>
+            </form>
+            <div id="register-message"></div>
+        </div>
+        
+        <section class="filters" style="display: none;">
+            <label for="day">Filter by Day:</label>
+            <select id="day">
+                <option value="">All Days</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+
+            <label for="course">Filter by Course:</label>
+            <select id="course">
+                <option value="">All Courses</option>
+                <!-- Options will be added by JS -->
+            </select>
+
+            <button id="filterBtn">Filter</button>
+        </section>
+
+        <section id="timetable-container" style="display: none;">
+            </section>
+
+        <section id="admin-panel" style="display: none;">
+            <h2>Admin Panel</h2>
+            <div id="admin-form" style="margin-top: 20px;">
+                <h3>Add New Class</h3>
+                <form id="add-timetable-form">
+                    <label>Course Name:</label>
+                    <input type="text" id="courseName" required>
+
+                    <label>Room Number:</label>
+                    <input type="text" id="roomNumber" required>
+
+                    <label>Day of Week:</label>
+                    <select id="dayOfWeek" required>
+                        <option value="">Select day</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+
+                    <label>Start Time:</label>
+                    <select id="startTime" required>
+                        <option value="">Select time</option>
+                        <option value="09:00">09:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="16:00">16:00</option>
+                    </select>
+
+                    <label>Teacher Name:</label>
+                    <input type="text" id="teacherName" required>
+
+                    <button type="submit">Add Timetable</button>
+                </form>
+            </div>
+        </section>
+
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
