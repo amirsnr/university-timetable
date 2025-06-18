@@ -83,33 +83,3 @@ timetable_project/
 ├── requirements.txt     # Python dependencies
 └── README.md
 ```
-
----
-
-## How to Upload to GitHub
-
-Here’s a simple step-by-step:
-
-1. **Go to GitHub**
-
-   Log in and click the “+” in the top-right corner → “New repository”.
-
-2. **Create Repository**
-   - Repository name: `university-timetable`
-   - Description: *optional*
-   - Keep it **public**
-   - Do NOT check “Initialize with README” (you already have one)
-
-3. **Copy the GitHub link** (e.g. https://github.com/yourusername/university-timetable.git)
-
-4. **In your terminal** (inside your project folder):
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/yourusername/university-timetable.git
-   git push -u origin main
-   ```
-
-5. **Done!** Go to your GitHub repo page and refresh — you’ll see all your files.

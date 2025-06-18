@@ -383,7 +383,6 @@ body.logged-in #logout-container {
     display: block;
 }
 @media (max-width: 1024px) {
-    /* Hide download and logout buttons on medium screens */
     #downloadPdfBtn,
     #logout-container {
         display: none !important;

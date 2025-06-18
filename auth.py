@@ -6,7 +6,6 @@ import jwt
 import datetime
 import psycopg2
 
-# Initialize Flask Blueprint for auth routes
 auth_bp = Blueprint('auth', __name__)
 
 # ---------------------- TOKEN DECORATORS ---------------------- #
@@ -17,7 +16,7 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
 
-        # Extract token from Authorization header (Bearer <token>)
+        # Extracts token from Authorization header (Bearer <token>)
         if 'Authorization' in request.headers:
             bearer = request.headers['Authorization']
             token = bearer.split()[1] if len(bearer.split()) > 1 else None
@@ -100,7 +99,7 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    """Authenticate a user or admin and return a JWT."""
+    """Authenticatea a user or admin and returna a JWT."""
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')

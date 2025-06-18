@@ -17,10 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ============================================================
-// DOMContentLoaded: Main Event Listener & DOM Setup
-// ============================================================
-
 document.addEventListener('DOMContentLoaded', () => {
     // ---- Authentication and UI Setup ----
     document.body.classList.add('login-screen');
@@ -37,11 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         handleRegister();
     });
 
-    // ---- Timetable and Filters ----
+    
     document.getElementById('filterBtn').addEventListener('click', filterTimetable);
     document.getElementById('add-timetable-form').addEventListener('submit', defaultFormSubmit);
-
-    // ---- PDF Download ----
     document.getElementById('downloadPdfBtn').addEventListener('click', handleDownloadPdf);
 
     // ---- Initial Auth Check ----
@@ -88,12 +82,12 @@ function handleLogin() {
 }
 
 function handleLogout() {
-    // Remove authentication info
+    // Removes authentication info
     localStorage.removeItem('token');
     localStorage.removeItem('is_admin');
-    // Update body class
+    // Updates body class
     document.body.classList.remove('logged-in');
-    // Show login section, hide everything else
+    // Shows login section, hides everything else
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'none';
@@ -102,7 +96,7 @@ function handleLogout() {
     document.getElementById('logout-container').style.display = 'none';
     document.getElementById('downloadPdfBtn').style.display = 'none';
     document.querySelector('.filters').style.display = 'none';
-    // Reset login form and show message
+    // Resets login form and shows message
     document.getElementById('login-form').reset();
 }
 
@@ -113,7 +107,7 @@ function showAppInterface(isAdmin) {
     document.getElementById('downloadPdfBtn').style.display = 'block';
     document.getElementById('timetable-container').style.display = 'block';
     document.querySelector('.filters').style.display = 'block';
-    // Hide login and register sections
+    // Hides login and registes sections
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'none';
     if (isAdmin) {
@@ -145,7 +139,7 @@ function toggleRegisterType() {
 }
 
 function handleRegister() {
-    // Prevent multiple submissions
+    // Prevents multiple submissions
     const submitBtn = document.getElementById('register-submit-btn');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Processing...';
@@ -155,7 +149,7 @@ function handleRegister() {
     const isAdmin = document.getElementById('register-type-btn').textContent === 'Register as Student';
     const adminCode = document.getElementById('admin-code')?.value;
     console.log({ username, email, password, isAdmin, adminCode });
-    // Validate admin code if registering as admin
+    // Validates admin code if registering as admin
     if (isAdmin && adminCode !== 'unime') {
         showRegisterMessage('Invalid admin code', 'error');
         submitBtn.disabled = false;
@@ -246,7 +240,7 @@ function displayTimetable(entries) {
     ];
     const grid = document.createElement('div');
     grid.className = 'timetable-grid';
-    // Add headers
+    // Adds headers
     const cornerCell = document.createElement('div');
     cornerCell.className = 'timetable-header';
     grid.appendChild(cornerCell);
@@ -256,7 +250,7 @@ function displayTimetable(entries) {
         dayHeader.textContent = day;
         grid.appendChild(dayHeader);
     });
-    // Add time slots
+    // Adds time slots
     timeSlots.forEach(slot => {
         const [startTime, endTime] = slot.time.split('-');
         if (slot.isBreak) {
@@ -371,10 +365,6 @@ function defaultFormSubmit(e) {
     });
 }
 
-// ============================================================
-// Timetable Edit and Delete (Admin)
-// ============================================================
-
 function editEntry(id) {
     document.getElementById("admin-panel").style.display = "block";
     document.getElementById("admin-form").style.display = "block";
@@ -464,13 +454,10 @@ function deleteEntry(id) {
     });
 }
 
-// ============================================================
-// PDF Download
-// ============================================================
 
 function handleDownloadPdf() {
     const timetable = document.getElementById('timetable-container');
-    timetable.scrollIntoView(); // ensure it's fully rendered
+    timetable.scrollIntoView(); // ensures it's fully rendered
     html2canvas(timetable, { scale: 2 }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jspdf.jsPDF('p', 'mm', 'a4');

@@ -73,11 +73,11 @@ def add_timetable(admin_id):
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Validate start and end time
+        # Validates start and end time
         if data['end_time'] <= data['start_time']:
             return jsonify({'message': 'End time must be after start time.', 'error': True}), 400
 
-        # Check for conflicting course in the same time slot
+        # Checks for conflicting course in the same time slot
         cur.execute("""
             SELECT * FROM timetable
             WHERE day_of_week = %s
@@ -88,7 +88,7 @@ def add_timetable(admin_id):
         if existing_slot:
             return jsonify({'message': 'A subject already exists in this time slot.', 'error': True}), 400
 
-        # Ensure room exists
+        # Ensures room exists
         cur.execute("SELECT room_id FROM rooms WHERE room_number = %s", (data['room_number'],))
         room = cur.fetchone()
         if not room:
@@ -98,7 +98,7 @@ def add_timetable(admin_id):
         else:
             room_id = room[0]
 
-        # Ensure course exists
+        # Ensures course exists
         cur.execute("SELECT course_id FROM courses WHERE course_name = %s", (data['course_name'],))
         course = cur.fetchone()
         if not course:
@@ -107,7 +107,7 @@ def add_timetable(admin_id):
         else:
             course_id = course[0]
 
-        # Insert into timetable
+        # Inserts into timetable
         cur.execute("""
             INSERT INTO timetable 
             (course_name, room_number, day_of_week, start_time, end_time, teacher_name, course_id, room_id)
@@ -145,11 +145,11 @@ def update_timetable(admin_id, entry_id):
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Validate start and end time
+        # Validates start and end time
         if data['end_time'] <= data['start_time']:
             return jsonify({'message': 'End time must be after start time.', 'error': True}), 400
 
-        # Check for conflicting course in the same time slot (excluding current entry)
+        # Checks for conflicting course in the same time slot (excluding current entry)
         cur.execute("""
             SELECT * FROM timetable
             WHERE day_of_week = %s
@@ -321,6 +321,6 @@ def get_courses():
         if conn:
             conn.close()
 
-# === App Runner ===
+
 if __name__ == '__main__':
     app.run(debug=True)
