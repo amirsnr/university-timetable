@@ -84,6 +84,14 @@ def register():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        # Check for duplicates in users
+        cur.execute("SELECT 1 FROM users WHERE email = %s OR username = %s", (email, username))
+        if cur.fetchone():
+            return jsonify({'error': 'Email or username already exists'}), 400
+        # Check for duplicates in admins
+        cur.execute("SELECT 1 FROM admins WHERE email = %s OR username = %s", (email, username))
+        if cur.fetchone():
+            return jsonify({'error': 'Email or username already exists'}), 400
         cur.execute(
             "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
             (username, email, hashed_password)
@@ -154,6 +162,14 @@ def admin_register():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        cur.execute("SELECT 1 FROM admins WHERE email = %s OR username = %s", (email, username))
+        if cur.fetchone():
+            return jsonify({'error': 'Email or username already exists'}), 400
+    
+        cur.execute("SELECT 1 FROM users WHERE email = %s OR username = %s", (email, username))
+        if cur.fetchone():
+            return jsonify({'error': 'Email or username already exists'}), 400
         cur.execute(
             "INSERT INTO admins (username, email, password) VALUES (%s, %s, %s)",
             (username, email, hashed_password)
