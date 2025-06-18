@@ -173,9 +173,8 @@ function handleRegister() {
                 submitBtn.textContent = 'Submit Registration';
             }, 1500);
         }
-    
-        else if (data.error && data.error.toLowerCase().includes('already exists')) {
-            showRegisterMessage('Email or username already exists', 'error');
+        else if (data.error && /already exists|duplicate|unique constraint|email|username/i.test(data.error)) {
+            showRegisterMessage('Email or username already exists.', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Registration';
             return;
