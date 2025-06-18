@@ -1,44 +1,33 @@
-from datetime import datetime
-import io
 from flask import Flask, jsonify, request, render_template, send_file
+from auth import auth_bp, token_required, admin_required, decode_token
+from db import get_db_connection, conn 
+from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from auth import auth_bp, token_required, admin_required, decode_token
-from db import get_db_connection, conn
+import io
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'mysecretkey'
 app.register_blueprint(auth_bp)
 
-# === Index Page ===
-@app.route('/')
-def index():
-    token = request.cookies.get('token')
-    is_admin = False
-    if token:
-        try:
-            data = decode_token(token)
-            email = data['email']
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM admins WHERE email = %s", (email,))
-            admin = cur.fetchone()
-            is_admin = admin is not None
-        except:
-            pass
-    return render_template('index.html', is_admin=is_admin)
+@app.route('/test-db')
+def test_db():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return "Database connection successful!"
+    except Exception as e:
+        return f"Database error: {e}"
 
-# === Timetable Routes ===
 @app.route('/timetable', methods=['GET'])
 @token_required
 def get_timetable(current_user_id):
-    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("SELECT * FROM timetable ORDER BY day_of_week, start_time")
         rows = cur.fetchall()
-    
+
         timetable = []
         for row in rows:
             start_time = row[4].strftime('%H:%M') if row[4] else None
@@ -64,7 +53,6 @@ def get_timetable(current_user_id):
 def add_timetable(admin_id):
     data = request.get_json()
     required_fields = ['course_name', 'room_number', 'day_of_week', 'start_time', 'end_time']
-    conn = None
 
     if not all(field in data for field in required_fields):
         return jsonify({'message': 'Missing required fields!'}), 400
@@ -93,7 +81,7 @@ def add_timetable(admin_id):
         room = cur.fetchone()
         if not room:
             cur.execute("INSERT INTO rooms (room_number, capacity) VALUES (%s, %s) RETURNING room_id", 
-                        (data['room_number'], 100))
+                        (data['room_number'], 0))
             room_id = cur.fetchone()[0]
         else:
             room_id = room[0]
@@ -136,7 +124,6 @@ def add_timetable(admin_id):
 def update_timetable(admin_id, entry_id):
     data = request.get_json()
     required_fields = ['course_name', 'room_number', 'day_of_week', 'start_time', 'end_time']
-    conn = None
 
     if not all(field in data for field in required_fields):
         return jsonify({'message': 'Missing required fields!'}), 400
@@ -190,7 +177,6 @@ def update_timetable(admin_id, entry_id):
 @app.route('/timetable/<int:entry_id>', methods=['DELETE'])
 @admin_required
 def delete_timetable(admin_id, entry_id):
-    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -203,11 +189,9 @@ def delete_timetable(admin_id, entry_id):
         if conn:
             conn.close()
 
-# === Admin API Routes ===
 @app.route('/admin-summary', methods=['GET'])
 @admin_required
 def admin_summary(admin_id):
-    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -228,13 +212,11 @@ def admin_summary(admin_id):
         if conn:
             conn.close()
 
-# === Timetable Filtering and PDF Download ===
 @app.route('/timetable/filter', methods=['GET'])
 @token_required
 def filter_timetable(current_user_id):
     day = request.args.get('day')
     course = request.args.get('course')
-    conn = None
 
     query = "SELECT * FROM timetable WHERE 1=1"
     params = []
@@ -266,48 +248,37 @@ def filter_timetable(current_user_id):
             })
         return jsonify({'filtered_timetable': timetable}), 200
     except Exception as e:
-        print("❌ Error while filtering timetable:", e)
+        print(" Error while filtering timetable:", e)
         return jsonify({'message': 'Internal server error'}), 500
-    finally:
-        if conn:
-            conn.close()
 
 @app.route('/timetable/download', methods=['GET'])
 def download_timetable():
-    conn = None
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id, course_name, room_number, day_of_week, start_time, end_time, teacher_name FROM timetable")
-        rows = cur.fetchall()
-        buffer = io.BytesIO()
-        pdf = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
-        y = height - 40
-        pdf.setFont("Helvetica-Bold", 14)
-        pdf.drawString(50, y, "University Class Timetable")
-        y -= 30
-        pdf.setFont("Helvetica", 10)
-        for row in rows:
-            line = f"{row[0]}. {row[1]} | {row[2]} | {row[3]} | {row[4].strftime('%-H:%M')} - {row[5].strftime('%-H:%M')} | {row[6]}"
-            pdf.drawString(50, y, line)
-            y -= 15
-            if y < 50:
-                pdf.showPage()
-                y = height - 40
-        pdf.save()
-        buffer.seek(0)
-        return send_file(buffer, as_attachment=True, download_name="timetable.pdf", mimetype='application/pdf')
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, course_name, room_number, day_of_week, start_time, end_time, teacher_name FROM timetable")
+    rows = cur.fetchall()
+    conn.close()
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+    y = height - 40
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, y, "University Class Timetable")
+    y -= 30
+    pdf.setFont("Helvetica", 10)
+    for row in rows:
+        line = f"{row[0]}. {row[1]} | {row[2]} | {row[3]} | {row[4].strftime('%-H:%M')} - {row[5].strftime('%-H:%M')} | {row[6]}"
+        pdf.drawString(50, y, line)
+        y -= 15
+        if y < 50:
+            pdf.showPage()
+            y = height - 40
+    pdf.save()
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name="timetable.pdf", mimetype='application/pdf')
 
-# === Dropdown Data Endpoints ===
 @app.route('/api/courses')
 def get_courses():
-    conn = None
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -320,6 +291,22 @@ def get_courses():
     finally:
         if conn:
             conn.close()
+
+@app.route('/')
+def index():
+    token = request.cookies.get('token')
+    is_admin = False
+    if token:
+        try:
+            data = decode_token(token)
+            email = data['email']
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM admins WHERE email = %s", (email,))
+            admin = cur.fetchone()
+            is_admin = admin is not None
+        except:
+            pass
+    return render_template('index.html', is_admin=is_admin)
 
 
 if __name__ == '__main__':
