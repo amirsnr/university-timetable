@@ -91,7 +91,9 @@ def register():
         conn.commit()
         return jsonify({'message': 'User registered!'}), 201
     except psycopg2.Error as e:
-        return jsonify({'error': str(e)}), 500
+        if 'already exists' in str(e).lower():
+            return jsonify({'error': 'Email or username already exists'}), 400
+        return jsonify({'error': 'Registration error'}), 500
     finally:
         if conn:
             conn.close()
@@ -99,7 +101,7 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    """Authenticatea a user or admin and returna a JWT."""
+    """Authenticate a user or admin and return a JWT."""
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -143,13 +145,9 @@ def admin_register():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    admin_code = data.get('admin_code') or data.get('adminCode')
 
-    if not all([username, email, password, admin_code]):
+    if not all([username, email, password]):
         return jsonify({'error': 'All fields required!'}), 400
-
-    if admin_code != "unime":
-        return jsonify({'error': 'Invalid admin code'}), 403
 
     hashed_password = generate_password_hash(password)
 
@@ -163,7 +161,9 @@ def admin_register():
         conn.commit()
         return jsonify({'message': 'Admin registered!'}), 201
     except psycopg2.Error as e:
-        return jsonify({'error': str(e)}), 500
+        if 'already exists' in str(e).lower():
+            return jsonify({'error': 'Email or username already exists'}), 400
+        return jsonify({'error': 'Registration error'}), 500
     finally:
         if conn:
             conn.close()
