@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('login-screen');
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ---- Authentication and UI Setup ----
+// Authentication and UI Setup 
     document.body.classList.add('login-screen');
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
@@ -33,18 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
         handleRegister();
     });
 
-    
+  
     document.getElementById('filterBtn').addEventListener('click', filterTimetable);
     document.getElementById('add-timetable-form').addEventListener('submit', defaultFormSubmit);
     document.getElementById('downloadPdfBtn').addEventListener('click', handleDownloadPdf);
-
-    // ---- Initial Auth Check ----
     checkAuthAndSetup();
 });
 
-// ============================================================
-// Authentication
-// ============================================================
+// Authentication 
 
 function checkAuthAndSetup() {
     const token = localStorage.getItem("token");
@@ -87,7 +84,7 @@ function handleLogout() {
     localStorage.removeItem('is_admin');
     // Updates body class
     document.body.classList.remove('logged-in');
-    // Shows login section, hides everything else
+    // Show logins section, hides everything else
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'none';
@@ -96,7 +93,6 @@ function handleLogout() {
     document.getElementById('logout-container').style.display = 'none';
     document.getElementById('downloadPdfBtn').style.display = 'none';
     document.querySelector('.filters').style.display = 'none';
-    // Resets login form and shows message
     document.getElementById('login-form').reset();
 }
 
@@ -107,7 +103,7 @@ function showAppInterface(isAdmin) {
     document.getElementById('downloadPdfBtn').style.display = 'block';
     document.getElementById('timetable-container').style.display = 'block';
     document.querySelector('.filters').style.display = 'block';
-    // Hides login and registes sections
+
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'none';
     if (isAdmin) {
@@ -116,9 +112,9 @@ function showAppInterface(isAdmin) {
     }
 }
 
-// ============================================================
-// Registration and Register Form Handling
-// ============================================================
+// REGISTER 
+
+let userType = 'student'; 
 
 function showRegisterForm(e) {
     e.preventDefault();
@@ -129,10 +125,12 @@ function showRegisterForm(e) {
 function toggleRegisterType() {
     const btn = document.getElementById('register-type-btn');
     const adminCodeContainer = document.getElementById('admin-code-container');
-    if (btn.textContent === 'Register as Admin') {
+    if (userType === 'student') {
+        userType = 'admin';
         btn.textContent = 'Register as Student';
         adminCodeContainer.style.display = 'block';
     } else {
+        userType = 'student';
         btn.textContent = 'Register as Admin';
         adminCodeContainer.style.display = 'none';
     }
@@ -146,7 +144,7 @@ function handleRegister() {
     const username = document.getElementById('reg-username').value;
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
-    const isAdmin = document.getElementById('register-type-btn').textContent === 'Register as Student';
+    const isAdmin = (userType === 'admin');
     const adminCode = document.getElementById('admin-code')?.value;
     console.log({ username, email, password, isAdmin, adminCode });
     // Validates admin code if registering as admin
@@ -166,7 +164,7 @@ function handleRegister() {
     .then(data => {
         if (data.message) {
             showRegisterMessage(data.message, 'success');
-            // Switch back to login after successful registration
+            // Switches back to login after successful registration
             setTimeout(() => {
                 document.getElementById('register-section').style.display = 'none';
                 document.getElementById('login-section').style.display = 'block';
@@ -174,7 +172,15 @@ function handleRegister() {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Registration';
             }, 1500);
-        } else {
+        }
+    
+        else if (data.error && data.error.toLowerCase().includes('already exists')) {
+            showRegisterMessage('Email or username already exists', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Registration';
+            return;
+        }
+        else {
             showRegisterMessage(data.error || 'Registration failed', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Registration';
@@ -204,9 +210,7 @@ function backToLogin() {
     document.getElementById('register-message').textContent = '';
 }
 
-// ============================================================
-// Timetable Management & Utilities
-// ============================================================
+// Timerable Management
 
 function loadTimetable(day = '', course = '') {
     const token = localStorage.getItem("token");
@@ -319,10 +323,6 @@ function filterTimetable() {
     loadTimetable(day, course);
 }
 
-// ============================================================
-// Timetable Form Submission (Add/Update)
-// ============================================================
-
 function defaultFormSubmit(e) {
     e.preventDefault();
     const formData = {
@@ -368,7 +368,7 @@ function defaultFormSubmit(e) {
 function editEntry(id) {
     document.getElementById("admin-panel").style.display = "block";
     document.getElementById("admin-form").style.display = "block";
-    // Scroll to admin panel
+   
     document.getElementById("admin-panel").scrollIntoView({ behavior: "smooth" });
     const subjectCard = document.querySelector(`button[onclick="editEntry(${id})"]`).closest(".subject-card");
     const course = subjectCard.querySelector("h4").textContent;
@@ -454,10 +454,10 @@ function deleteEntry(id) {
     });
 }
 
-
+// PDF Download
 function handleDownloadPdf() {
     const timetable = document.getElementById('timetable-container');
-    timetable.scrollIntoView(); // ensures it's fully rendered
+    timetable.scrollIntoView(); 
     html2canvas(timetable, { scale: 2 }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
